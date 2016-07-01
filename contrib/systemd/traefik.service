@@ -1,0 +1,6 @@
+[Unit]
+Description=Traefik
+
+[Service]
+ExecStart=/usr/bin/traefik --configFile=/etc/traefik.toml
+Restart=on-failure

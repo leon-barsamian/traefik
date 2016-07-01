@@ -1,0 +1,18 @@
+[backends]{{range .Containers}}
+    [backends.backend-{{getBackend .}}.servers.server-{{.Name | replace "/" "" | replace "." "-"}}]
+    url = "{{getProtocol .}}://{{getIPAddress .}}:{{getPort .}}"
+    weight = {{getWeight .}}
+{{end}}
+
+[frontends]{{range $frontend, $containers := .Frontends}}
+  [frontends."frontend-{{$frontend}}"]{{$container := index $containers 0}}
+  backend = "backend-{{getBackend $container}}"
+  passHostHeader = {{getPassHostHeader $container}}
+  rewriteHostHeader = "{{getRewriteHostHeader $container}}"
+  priority = {{getPriority $container}}
+  entryPoints = [{{range getEntryPoints $container}}
+    "{{.}}",
+  {{end}}]
+    [frontends."frontend-{{$frontend}}".routes."route-frontend-{{$frontend}}"]
+    rule = "{{getFrontendRule $container}}"
+{{end}}
